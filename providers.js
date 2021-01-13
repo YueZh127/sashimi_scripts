@@ -1,9 +1,15 @@
 const info = require('./info.json');
 const Web3 = require('web3');
+const ethUtils = require('ethereumjs-util')
 
-async function useKovanProvider() {
+async function useKovanProvider(senderPkey) {
     console.log('using kovan provider..');
-    return new Web3(info.kovan);
+    this.web3 = new Web3(info.kovan);
+    this.pkey = senderPkey;
+    this.web3.eth.accounts.wallet.add(this.pkey)
+    this.walletOwnerAddress = '0x'+ethUtils.privateToAddress(ethUtils.toBuffer('0x' + this.pkey)).toString('hex')
+    this.web3.eth.defaultAccount = this.walletOwnerAddress
+    return this.web3;
 }
 
 async function useMainnetProvider() {
@@ -11,9 +17,19 @@ async function useMainnetProvider() {
     return new Web3(info.mainnet);
 }
 
+async function addAccount(Web3, keys){
+    console.log('add keys...');
+    keys.forEach(function (k){
+        console.log(k);
+        Web3.eth.accounts.wallet.add(k);
+    });
+}
+
 module.exports ={
     mainnet : info.mainnet,
     kovan : info.kovan,
     useKovanProvider : useKovanProvider,
-    useMainnetProvider : useMainnetProvider
+    useMainnetProvider : useMainnetProvider,
+
+    addAccount:addAccount
 }

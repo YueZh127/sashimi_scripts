@@ -1,0 +1,7 @@
+{
+  "minimumLockAmount": 10000000000,
+  "maximalLockAmount": 10000000000000000000000,
+  "maximalLeafCount": 1024,
+  "indexTree": 0,
+  "outputPath": "/Users/zhengyue/.local/share/aelf/tokenSwapTest/"
+}

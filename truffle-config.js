@@ -9,7 +9,7 @@ module.exports = {
         development: {
             host: "127.0.0.1",
             network_id: "*",
-            port: 7245,
+            port: 8545,
             gas: 4000000,
             gasPrice: 10000000000, // 10 gwei
         },
@@ -19,7 +19,7 @@ module.exports = {
                 return new HDWalletProvider(keys.privateKeys, providers.kovan, 0, keys.privateKeys.length)
             },
             network_id: 42,
-            gas: 1000000,      //make sure this gas allocation isn't over 4M, which is the max
+            gas: 10000000,      //make sure this gas allocation isn't over 4M, which is the max
             gasPrice : 10000000000, //10 GWei
             networkCheckTimeout: 10000000
         },
