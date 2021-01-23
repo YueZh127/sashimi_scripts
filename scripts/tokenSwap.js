@@ -10,10 +10,15 @@ const fs = require('fs');
 
 const info = require('../swapInfo.json');
 
-const argv = require('minimist')(process.argv.slice(2), {string: ['network']});
+const argv = require('minimist')(process.argv.slice(2), {
+    string: ['network'],
+    string: ['isFinished'],
+    string: ['isOutputTree']
+});
 const assert = require('assert').strict;
 
-const alice = keys.address.alice;
+// const alice = keys.address.alice;
+const amy = keys.address.amy;
 const owner = config.sender;
 const sender = keys.address.test;
 
@@ -51,16 +56,15 @@ module.exports = async function () {
         ELFContract = await contract.initContract('ELFToken', web3, elfToken);
         LockContract = await contract.initContract('Lock', web3, lockAddress);
         //without finish, token burned
-        ReceiptMakerContract = await contract.initContract('ReceiptMaker', web3, makerAddress);
+        // ReceiptMakerContract = await contract.initContract('ReceiptMaker', web3, makerAddress);
         MerkleContract = await contract.initContract('Merkle', web3, merkleAddress);
-
     }
 
     let senders = web3.eth.accounts.wallet;
     // logger.info(senders);
     let accountCount = web3.eth.accounts.wallet.length;
-    let exceptTreeIndex = await GetTreeIndex(MerkleContract);
     for (let i = 0; i < maxLeaf; i++) {
+        let exceptTreeIndex = await GetTreeIndex(MerkleContract);
         logger.info(`Begin generate tree ${exceptTreeIndex} ...`)
         logger.info(`Attempt except Receipts:`);
         // let exceptReceipts = await GetReceiptsAmount(ReceiptMakerContract, MerkleContract, exceptTreeIndex + 1);
@@ -68,8 +72,9 @@ module.exports = async function () {
 
         logger.info(`ExceptReceipts: ${exceptReceipts}`)
         let receiptIds = [];
+
         if (exceptReceipts !== i + 1 && i !== 0) {
-            let theLastReceiptId = await GetReceiptCount(ReceiptMakerContract);
+            let theLastReceiptId = await GetReceiptCount(LockContract);
             let treeCount = await GetTreeCount(MerkleContract);
             let lastTreeInfo = await GetTreeInfo(MerkleContract, treeCount - 1);
             let theFirstReceiptId = Number(lastTreeInfo[1]) + Number(lastTreeInfo[2]);
@@ -77,77 +82,93 @@ module.exports = async function () {
             for (let p = theFirstReceiptId; p < theLastReceiptId; p++)
                 receiptIds.push(p);
         }
+        exceptReceipts = maxLeaf;
         while (exceptReceipts > 0) {
             for (let i = 0; i < accountCount; i++) {
                 let amount = getRndInteger(bigInt(minimum_allowance), bigInt(maximal_lock_amount));
                 logger.info(`Attempt lock ${amount}`);
                 let targetIndex = getRndInteger(0, aelfAddresses.length - 1);
-                // let receiptId = await LockAction(ELFContract, ReceiptMakerContract, senders[i].address, aelfAddresses[targetIndex], amount.toString());
-                await LockAction(ELFContract, ReceiptMakerContract, senders[i].address, aelfAddresses[targetIndex], amount.toString());
+                // let receiptId = await LockAction(ELFContract, LockContract, senders[i].address, aelfAddresses[targetIndex], amount.toString());
+                await LockAction(ELFContract, LockContract, senders[i].address, aelfAddresses[targetIndex], amount.toString());
                 // receiptIds.push(receiptId);
                 exceptReceipts--;
                 if (exceptReceipts === 0)
                     break;
+                await sleep(30000);
             }
         }
 
-
-        await RecordReceipts(MerkleContract);
-        //get tree info
-        let treeCount = await CheckTree(MerkleContract, ReceiptMakerContract);
-        let treeIndex = treeCount - 1;
-        let merkleInfo = await GetTreeInfo(MerkleContract, treeIndex);
-
-        let merkleFirstReceipt = merkleInfo[1];
-        let theLastReceiptId = Number(merkleInfo[1]) + Number(merkleInfo[2]);
-
-        for (let p = merkleFirstReceipt; p < theLastReceiptId; p++)
-            receiptIds.push(p);
-
-        let merkleRoot = merkleInfo[0];
-        let merkleReceiptCounts = merkleInfo[2];
-
-        //get receipt info
-        let receiptArray = [];
-        for (let r = 0; r < receiptIds.length; r++) {
-            let receiptInfo = await GetReceiptInfo(ReceiptMakerContract, receiptIds[r]);
-            let amount = receiptInfo[2];
-            let receipt = await GetReceipts(ReceiptMakerContract, receiptIds[r]);
-            let owner = receipt[1];
-            logger.info(`Get receipt ${receiptIds[r]}, owner: ${owner}, amount: ${amount}`)
-
-            let merklePathData = await GenerateMerklePath(MerkleContract, receiptIds[r]);
-
-            let merklePath = {
-                "path_length": merklePathData[1],
-                "nodes": merklePathData[2],
-                "positions": merklePathData[3]
-            };
-
-            let receiptData = {
-                "receipt_id": receiptIds[r],
-                "uid": receiptInfo[0],
-                "targetAddress": receiptInfo[1],
-                "amount": amount,
-                "isFinished": receiptInfo[3],
-                "merkle_path": merklePath
-            }
-            receiptArray.push(receiptData);
-        }
-
-        let info = {
-            "merkle_root": merkleRoot, "tree_index": treeIndex,
-            "receipt_counts": merkleReceiptCounts, "receipts": receiptArray
-        }
-        //write to file
-        await writeJson(treeCount, info);
+        // await RecordReceipts(MerkleContract);
+        // //get tree info
+        // let treeCount = await CheckTree(MerkleContract, LockContract);
+        // let treeIndex = treeCount - 1;
+        // let merkleInfo = await GetTreeInfo(MerkleContract, treeIndex);
+        //
+        // let merkleFirstReceipt = merkleInfo[1];
+        // let theLastReceiptId = Number(merkleInfo[1]) + Number(merkleInfo[2]);
+        //
+        // for (let p = merkleFirstReceipt; p < theLastReceiptId; p++)
+        //     receiptIds.push(p);
+        //
+        // let merkleRoot = merkleInfo[0];
+        // let merkleReceiptCounts = merkleInfo[2];
+        //
+        // //get receipt info
+        // let receiptArray = [];
+        // for (let r = 0; r < receiptIds.length; r++) {
+        //     let receiptInfo = await GetReceiptInfo(LockContract, receiptIds[r]);
+        //     let amount = receiptInfo[2];
+        //     let receipt = await GetReceipts(LockContract, receiptIds[r]);
+        //     let owner = receipt[1];
+        //     logger.info(`Get receipt ${receiptIds[r]}, owner: ${owner}, amount: ${amount}`)
+        //
+        //     let merklePathData = await GenerateMerklePath(MerkleContract, receiptIds[r]);
+        //
+        //     let merklePath = {
+        //         "path_length": merklePathData[1],
+        //         "nodes": merklePathData[2],
+        //         "positions": merklePathData[3]
+        //     };
+        //
+        //     let receiptData = {
+        //         "receipt_id": receiptIds[r],
+        //         "uid": receiptInfo[0],
+        //         "targetAddress": receiptInfo[1],
+        //         "amount": amount,
+        //         "isFinished": receiptInfo[3],
+        //         "merkle_path": merklePath
+        //     }
+        //     receiptArray.push(receiptData);
         // }
+        //
+        // let info = {
+        //     "merkle_root": merkleRoot, "tree_index": treeIndex,
+        //     "receipt_counts": merkleReceiptCounts, "receipts": receiptArray
+        // }
+        // //write to file
+        // await writeJson(treeCount, info);
+    }
 
-
+    if (argv['isFinished'] === 'true') {
         accountCount = web3.eth.accounts.wallet.length;
-        for (let i = 1; i < accountCount; i++) {
+        for (let i = 0; i < accountCount; i++) {
             await CheckAndFinishAction(LockContract, senders[i].address);
         }
+    }
+
+    if (argv['isOutputTree'] === 'true') {
+        let treeInfoList = [];
+        let treeCount = await CheckTree(MerkleContract, LockContract);
+        for (let i = 0; i < treeCount; i++) {
+            let merkleInfo = await GetTreeInfo(MerkleContract, i);
+            let info = {
+                "index": i,
+                "root": merkleInfo[0]
+            };
+            treeInfoList.push(info);
+        }
+        let treeInfos = {"treeInfos": treeInfoList}
+        await writeJson("TreeInfos", treeInfos);
     }
 }
 
@@ -163,12 +184,15 @@ async function LockAction(ELFContract, LockContract, sender, targetAddress, amou
     let receiptedAmount = await CheckReceiptAmount(LockContract, sender);
     logger.info(`User ${sender} already receipted amount ${receiptedAmount}`)
 
-    let receiverBalance = await CheckReceiverBalance(LockContract, ELFContract);
-    if (bigInt(balance) < bigInt(amount)) {
+    let totalAmount = await CheckTotalReceiptAmount(LockContract);
+    logger.info(`Total receipted amount ${totalAmount}`)
+
+    // let receiverBalance = await CheckReceiverBalance(LockContract, ELFContract);
+    if (bigInt(balance) < bigInt(amount) && sender!== amy ) {
         let transfer = await contract.callSendMethod(
             ELFContract,
             'transfer',
-            alice,
+            amy,
             [sender, amount]
         );
         logger.info(`transfer tx: ${transfer.transactionHash}: ${transfer.status}`);
@@ -202,29 +226,30 @@ async function LockAction(ELFContract, LockContract, sender, targetAddress, amou
     logger.info(`spender ${LockContract.address}, owner ${sender}, allowance : ${allowance}`);
     await sleep(3000);
 
+    let randomCode = amount % 3 === 0 ? "" : getRndString();
     // lock token:
     let createReceipt = await contract.callSendMethod(
         LockContract,
         'createReceipt',
         sender,
-        [amount, targetAddress]
+        [amount, targetAddress, randomCode]
     );
     logger.info(`createReceipt tx: ${createReceipt.transactionHash}: ${createReceipt.status}`);
     assert.strictEqual(createReceipt.status, true,
         `Transfer transaction is failed ...${createReceipt.error}`);
 
-    // let block = createReceipt.blockNumber;
-    // let events = await LockContract.getPastEvents('NewReceipt', {
-    //     filter: {owner: sender},
-    //     fromBlock: block - 5,
-    //     toBlock: 'latest'
-    // });
-    // let createEvent = events[events.length - 1];
-    // let txId = createEvent.transactionHash;
-    // console.assert(txId === createReceipt.transactionHash,)
-    // let returnValues = createEvent.returnValues;
-    // logger.info(returnValues);
-    // console.assert(returnValues[3] === amount, 'amount is incorrect ...');
+    let block = createReceipt.blockNumber;
+    let events = await LockContract.getPastEvents('NewReceipt', {
+        filter: {owner: sender},
+        fromBlock: block - 5,
+        toBlock: 'latest'
+    });
+    let createEvent = events[events.length - 1];
+    let txId = createEvent.transactionHash;
+    console.assert(txId === createReceipt.transactionHash,)
+    let returnValues = createEvent.returnValues;
+    logger.info(returnValues);
+    console.assert(returnValues[3] === amount, 'amount is incorrect ...');
 
     let afterBalance = await contract.callViewMethod(
         ELFContract,
@@ -238,9 +263,13 @@ async function LockAction(ELFContract, LockContract, sender, targetAddress, amou
     logger.info(`User ${sender} already receipted amount ${afterReceiptedAmount}`)
     console.assert(BigInt(afterReceiptedAmount) === BigInt(receiptedAmount) + BigInt(amount), 'sender receipt amount is incorrect ...');
 
-    let afterReceiverBalance = await CheckReceiverBalance(LockContract, ELFContract);
-    logger.info(`Receiver balance: ${afterReceiverBalance}`)
-    console.assert(BigInt(afterReceiverBalance) === BigInt(receiverBalance) + BigInt(amount), 'receiver balance is incorrect ...');
+    let afterTotalAmount = await CheckTotalReceiptAmount(LockContract);
+    logger.info(`After lock total receipted amount ${afterTotalAmount}`)
+    console.assert(BigInt(afterTotalAmount) === BigInt(totalAmount) + BigInt(amount), 'total receipt amount is incorrect ...');
+
+    // let afterReceiverBalance = await CheckReceiverBalance(LockContract, ELFContract);
+    // logger.info(`Receiver balance: ${afterReceiverBalance}`)
+    // console.assert(BigInt(afterReceiverBalance) === BigInt(receiverBalance) + BigInt(amount), 'receiver balance is incorrect ...');
 
     // return returnValues[0];
 }
@@ -275,8 +304,15 @@ async function CheckReceiverBalance(Contract, ELFContract) {
 async function CheckReceiptAmount(Contract, sender) {
     return await contract.callViewMethod(
         Contract,
-        'getMyReceiptsAmount',
+        'getLockTokens',
         [sender]
+    );
+}
+
+async function CheckTotalReceiptAmount(Contract) {
+    return await contract.callViewMethod(
+        Contract,
+        'totalAmountInReceipts'
     );
 }
 
@@ -403,7 +439,6 @@ async function GetTreeFile(MerkleContract, index) {
     return receiptIds;
 }
 
-
 async function CheckAndFinishAction(LockContract, sender) {
     logger.info(sender);
     let accountReceipts = await contract.callViewMethod(
@@ -444,6 +479,9 @@ async function CheckAndFinishAction(LockContract, sender) {
         logger.info(receipts[5]);
 
         if (receipts[5] < dateNow && !receipts[6]) {
+            // check total amount
+            let totalAmount = await CheckTotalReceiptAmount(LockContract);
+            logger.info(`before finish total receipted amount ${totalAmount}`);
             // finish
             let finishReceipt = await contract.callSendMethod(
                 LockContract,
@@ -455,7 +493,7 @@ async function CheckAndFinishAction(LockContract, sender) {
             let block = finishReceipt.blockNumber;
             let events = await LockContract.getPastEvents('ReceiptFinished', {
                 filter: {owner: sender},
-                fromBlock: block - 1,
+                fromBlock: block - 5,
                 toBlock: 'latest'
             });
             let finishEvent = events[events.length - 1];
@@ -469,6 +507,11 @@ async function CheckAndFinishAction(LockContract, sender) {
                 [id]
             );
             console.assert(receipts[6], 'finish failed ...');
+            let amount = receipts[3];
+
+            let afterTotalAmount = await CheckTotalReceiptAmount(LockContract);
+            logger.info(`After finish total receipted amount ${afterTotalAmount}`)
+            console.assert(BigInt(afterTotalAmount) === BigInt(totalAmount) + BigInt(amount), 'total receipt amount is incorrect ...');
         }
 
         let receiptsInfo = await contract.callViewMethod(
@@ -492,6 +535,10 @@ async function writeJson(file, obj) {
 
 function getRndInteger(min, max) {
     return BigInt(Math.floor(Math.random() * (max - min + 1)) + min);
+}
+
+function getRndString() {
+    return Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
 }
 
 function sleep(time) {

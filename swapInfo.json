@@ -1,5 +1,5 @@
 {
-  "minimumLockAmount": 10000000000,
+  "minimumLockAmount": 4000000000000,
   "maximalLockAmount": 10000000000000000000000,
   "maximalLeafCount": 1024,
   "indexTree": 0,
