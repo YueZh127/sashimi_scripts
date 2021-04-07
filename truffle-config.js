@@ -31,6 +31,15 @@ module.exports = {
             network_id: 1,
             gas: 200000,      //make sure this gas allocation isn't over 4M, which is the max
             gasPrice : 160000000000, //160 GWei
+        },
+
+        bsctest:{
+            provider: function (){
+                return new HDWalletProvider(keys.privateKeys, providers.bsctest, 0, keys.privateKeys.length)
+            },
+            network_id: 97,
+            gas: 10000000,      //make sure this gas allocation isn't over 4M, which is the max
+            gasPrice : 10000000000, //160 GWei
         }
     },
     mocha: {

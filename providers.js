@@ -17,6 +17,16 @@ async function useMainnetProvider() {
     return new Web3(info.mainnet);
 }
 
+async function useBscTestProvider(senderPkey) {
+    console.log('using bsc-test provider..');
+    this.web3 = new Web3(info.bsctest);
+    this.pkey = senderPkey;
+    this.web3.eth.accounts.wallet.add(this.pkey)
+    this.walletOwnerAddress = '0x'+ethUtils.privateToAddress(ethUtils.toBuffer('0x' + this.pkey)).toString('hex')
+    this.web3.eth.defaultAccount = this.walletOwnerAddress
+    return this.web3;
+}
+
 async function addAccount(Web3, keys){
     console.log('add keys...');
     keys.forEach(function (k){
@@ -28,8 +38,11 @@ async function addAccount(Web3, keys){
 module.exports ={
     mainnet : info.mainnet,
     kovan : info.kovan,
+    bsctest: info.bsctest,
+
     useKovanProvider : useKovanProvider,
     useMainnetProvider : useMainnetProvider,
+    useBscTestProvider : useBscTestProvider,
 
     addAccount:addAccount
 }

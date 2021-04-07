@@ -4,9 +4,9 @@ const keys = require("../keys");
 const contracts = require('./contracts-config');
 const tokens = require('./tokens-config');
 const contract = require("./basicContract");
+const helper = require("./helper");
 const logger = require('log-js')();
 const bigInt = require("big-integer");
-const fs = require('fs');
 
 const info = require('../swapInfo.json');
 
@@ -48,7 +48,7 @@ module.exports = async function () {
         let merkleAddress = contracts.kovan.merkle;
         let elfToken = tokens.kovan.elf;
 
-        ELFContract = await contract.initContract('ELFToken', web3, elfToken);
+        ELFContract = await contract.initContract('ERC20Token', web3, elfToken);
         LockContract = await contract.initContract('Lock', web3, lockAddress);
         //without finish, token burned
         ReceiptMakerContract = await contract.initContract('ReceiptMaker', web3, makerAddress);
@@ -79,9 +79,9 @@ module.exports = async function () {
         }
         while (exceptReceipts > 0) {
             for (let i = 0; i < accountCount; i++) {
-                let amount = getRndInteger(bigInt(minimum_allowance), bigInt(maximal_lock_amount));
+                let amount = helper.getRndInteger(bigInt(minimum_allowance), bigInt(maximal_lock_amount));
                 logger.info(`Attempt lock ${amount}`);
-                let targetIndex = getRndInteger(0, aelfAddresses.length - 1);
+                let targetIndex = helper.getRndInteger(0, aelfAddresses.length - 1);
                 // let receiptId = await LockAction(ELFContract, ReceiptMakerContract, senders[i].address, aelfAddresses[targetIndex], amount.toString());
                 await LockAction(ELFContract, ReceiptMakerContract, senders[i].address, aelfAddresses[targetIndex], amount.toString());
                 // receiptIds.push(receiptId);
@@ -140,7 +140,7 @@ module.exports = async function () {
             "receipt_counts": merkleReceiptCounts, "receipts": receiptArray
         }
         //write to file
-        await writeJson(treeCount, info);
+        await helper.writeJson(treeCount, info, outputPath);
         // }
 
 
@@ -200,7 +200,7 @@ async function LockAction(ELFContract, LockContract, sender, targetAddress, amou
         [sender, LockContract.address]
     );
     logger.info(`spender ${LockContract.address}, owner ${sender}, allowance : ${allowance}`);
-    await sleep(3000);
+    await helper.sleep(3000);
 
     // lock token:
     let createReceipt = await contract.callSendMethod(
@@ -413,7 +413,7 @@ async function CheckAndFinishAction(LockContract, sender) {
     );
     logger.info(accountReceipts);
 
-    if (accountReceipts == '') return;
+    if (accountReceipts === '') return;
     let index = accountReceipts[accountReceipts.length - 1];
     logger.info(`check receipts index : ${index}`);
 
@@ -480,20 +480,4 @@ async function CheckAndFinishAction(LockContract, sender) {
     }
 }
 
-async function writeJson(file, obj) {
-    let json = JSON.stringify(obj);
-    fs.writeFile(outputPath + `/${file}.json`, json, 'utf8', (err) => {
-        if (err) {
-            throw err;
-        }
-        console.log("JSON data is saved in", `${file}.json`);
-    });
-}
 
-function getRndInteger(min, max) {
-    return BigInt(Math.floor(Math.random() * (max - min + 1)) + min);
-}
-
-function sleep(time) {
-    return new Promise((resolve) => setTimeout(resolve, time));
-}

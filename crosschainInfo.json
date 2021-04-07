@@ -1,0 +1,7 @@
+{
+  "maxAmountPerDay": 100000000000000000000000,
+  "maxAmount": 1000000000000000000000,
+  "minAmount": 1,
+  "fee": 100,
+  "outputPath": "/Users/zy/.local/share/aelf/crosschain"
+}

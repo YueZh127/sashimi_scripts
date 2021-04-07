@@ -8,12 +8,18 @@ module.exports = {
         investment: info.contracts.kovan.investment,
         lock: info.contracts.kovan.lock,
         maker: info.contracts.kovan.maker,
-        merkle: info.contracts.kovan.merkle
+        merkle: info.contracts.kovan.merkle,
+        distributor:info.contracts.kovan.distributor,
+        cross:info.contracts.kovan.cross
     },
 
     mainnet: {
         timeLock: info.contracts.mainnet.timeLock,
         chef: info.contracts.mainnet.chef,
         factory: info.contracts.mainnet.factory
-    }
+    },
+
+    bsctest: {
+        cross:info.contracts.bsctest.cross
+    },
 }

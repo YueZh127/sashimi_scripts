@@ -1,18 +1,26 @@
-const ElfTokenABI = require('../abi/elfTokenAbi.json');
+const TokenJson = require('../build/contracts/ERC20.json');
 const LockJson = require('../build/contracts/LockMapping.json');
 const MerkleJson = require('../build/contracts/MerkleTreeGenerator.json');
 const ReceiptMakerJson = require('../build/contracts/ReceiptMaker.json');
+const DistributorJson = require('../build/contracts/MerkleDistributor.json')
+const CrossChainJson = require('../build/contracts/CrossChain.json')
+
+const TokenABI = TokenJson["abi"];
 const LockABI = LockJson["abi"];
 const MerkleABI = MerkleJson["abi"];
 const ReceiptMakerABI = ReceiptMakerJson["abi"];
+const DistributorABI = DistributorJson["abi"];
+const CrossChainABI = CrossChainJson["abi"];
 
 const info = require('../info.json');
 
 const contractsABI = {
-    ELFToken: ElfTokenABI,
+    ERC20Token: TokenABI,
     Lock: LockABI,
     Merkle: MerkleABI,
-    ReceiptMaker: ReceiptMakerABI
+    ReceiptMaker: ReceiptMakerABI,
+    Distributor: DistributorABI,
+    CrossChain: CrossChainABI
 };
 
 async function initContract(contractName, web3, contractAddress, contractABI = null) {
@@ -36,7 +44,7 @@ async function callViewMethod(contract,functionName, paramsOption) {
     }
 }
 
-async function callSendMethod(contract, functionName, account, paramsOption) {
+async function callSendMethod(contract, functionName, account, paramsOption,value =0) {
     try {
         console.log(paramsOption);
 
@@ -44,13 +52,42 @@ async function callSendMethod(contract, functionName, account, paramsOption) {
             return await contract.methods[functionName](...paramsOption).send({
                 from: account,
                 gas: info.gasInfo.gas,
-                gasPrice: info.gasInfo.gasPrice
+                gasPrice: info.gasInfo.gasPrice,
+                value: value
             });
         }
         return await contract.methods[functionName]().send({
             from: account,
             gas: info.gasInfo.gas,
-            gasPrice: info.gasInfo.gasPrice
+            gasPrice: info.gasInfo.gasPrice,
+            value: value
+        });
+    } catch (e) {
+        console.log('callSendMethod: ', e);
+        return {
+            error: e
+        };
+    }
+}
+
+function callSendMethodWithOutResult(contract, functionName, account, paramsOption,nonce,value =0) {
+    try {
+        console.log(paramsOption);
+
+        if (paramsOption) {
+            return contract.methods[functionName](...paramsOption).send({
+                from: account,
+                gas: info.gasInfo.gas,
+                gasPrice: info.gasInfo.gasPrice,
+                value: value,
+                nonce:nonce
+            });
+        }
+        return contract.methods[functionName]().send({
+            from: account,
+            gas: info.gasInfo.gas,
+            gasPrice: info.gasInfo.gasPrice,
+            value: value
         });
     } catch (e) {
         console.log('callSendMethod: ', e);
@@ -64,5 +101,6 @@ async function callSendMethod(contract, functionName, account, paramsOption) {
 module.exports = {
     initContract: initContract,
     callViewMethod: callViewMethod,
-    callSendMethod: callSendMethod
+    callSendMethod: callSendMethod,
+    callSendMethodWithOutResult:callSendMethodWithOutResult
 }
