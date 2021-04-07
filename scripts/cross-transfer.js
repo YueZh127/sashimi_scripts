@@ -81,18 +81,18 @@ module.exports = async function () {
         logger.info('Transfer bsc ===> eth');
         await getCrossChainInfo(bsc_CrossChainContract, bscShdToken, chain_eth);
         for (let i = 0; i < bsd_accountCount; i++) {
-            // if (senders[i].address == layer1) continue;
-            // let info = await crossChainTransfer(bsc_CrossChainContract, bsc_SHDContract, chain_eth, bsc_senders[i].address, bscShdToken);
-            // if (info !== null) crossChainTxInfos.push(info);
+            if (senders[i].address == layer1) continue;
+            let info = await crossChainTransfer(bsc_CrossChainContract, bsc_SHDContract, chain_eth, bsc_senders[i].address, bscShdToken);
+            if (info !== null) crossChainTxInfos.push(info);
 
 
             let balance = await checkBalance(bsc_SHDContract, bsc_senders[i].address);
             logger.info(`account: ${bsc_senders[i].address}, balance ===> ${balance}`);
         }
         logger.info('receive on eth ... ');
-        // await getCrossChainInfo(CrossChainContract, shdToken, chain_bsc);
+        await getCrossChainInfo(CrossChainContract, shdToken, chain_bsc);
 
-        // await receiveToken(crossChainTxInfos,CrossChainContract,SHDContract,shdToken);
+        await receiveToken(crossChainTxInfos,CrossChainContract,SHDContract,shdToken);
     }
 
     console.log('End.');
