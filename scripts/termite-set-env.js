@@ -183,9 +183,20 @@ async function AddStrategy(controller,strategyContract){
         'getStrategies'
     )
     console.assert(getStrategies.includes(strategyContract),`Strategy add failed`)
+    logger.info(`Strategy: ${getStrategies}`)
 }
 
 async function SetStrategy(controller,strategyContract,fundPool){
+    let check = await contract.callViewMethod(
+        controller,
+        'approvedStrategies',
+        [fundPool,strategyContract]
+    )
+    if (check != 0)
+    {
+        logger.info(`pool: ${fundPool} ==== strategy: ${strategyContract} already set`)
+        return;
+    }
     let result =  await contract.callSendMethod(
         controller,
         'setStrategy',
