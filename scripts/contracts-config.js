@@ -10,7 +10,10 @@ module.exports = {
         maker: info.contracts.kovan.maker,
         merkle: info.contracts.kovan.merkle,
         distributor:info.contracts.kovan.distributor,
-        cross:info.contracts.kovan.cross
+        cross:info.contracts.kovan.cross,
+        oracle: info.contracts.kovan.oracle,
+        fundPool: info.contracts.kovan.fundpool,
+        controller: info.contracts.kovan.controllerDelegator
     },
 
     mainnet: {

@@ -2,8 +2,12 @@ const TokenJson = require('../build/contracts/ERC20.json');
 const LockJson = require('../build/contracts/LockMapping.json');
 const MerkleJson = require('../build/contracts/MerkleTreeGenerator.json');
 const ReceiptMakerJson = require('../build/contracts/ReceiptMaker.json');
-const DistributorJson = require('../build/contracts/MerkleDistributor.json')
-const CrossChainJson = require('../build/contracts/CrossChain.json')
+const DistributorJson = require('../build/contracts/MerkleDistributor.json');
+const CrossChainJson = require('../build/contracts/CrossChain.json');
+const OracleJson = require('../build/contracts/AccessControlledOffchainAggregator.json');
+const FundPoolJson = require('../build/contracts/FundPoolDelegate.json');
+const ControllerJson = require('../build/contracts/Controller.json');
+const StrategyJson = require('../build/contracts/FarmStrategy.json');
 
 const TokenABI = TokenJson["abi"];
 const LockABI = LockJson["abi"];
@@ -11,6 +15,10 @@ const MerkleABI = MerkleJson["abi"];
 const ReceiptMakerABI = ReceiptMakerJson["abi"];
 const DistributorABI = DistributorJson["abi"];
 const CrossChainABI = CrossChainJson["abi"];
+const OracleABI = OracleJson["abi"];
+const FundPoolABI = FundPoolJson["abi"];
+const ControllerABI = ControllerJson["abi"];
+const StrategyABI = StrategyJson["abi"];
 
 const info = require('../info.json');
 
@@ -20,7 +28,11 @@ const contractsABI = {
     Merkle: MerkleABI,
     ReceiptMaker: ReceiptMakerABI,
     Distributor: DistributorABI,
-    CrossChain: CrossChainABI
+    CrossChain: CrossChainABI,
+    Oracle: OracleABI,
+    FundPool: FundPoolABI,
+    Controller: ControllerABI,
+    Strategy: StrategyABI
 };
 
 async function initContract(contractName, web3, contractAddress, contractABI = null) {
