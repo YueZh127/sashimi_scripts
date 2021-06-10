@@ -1,32 +1,24 @@
-const info = require('./info.json');
+const {addresses, aelfAddress, aelfAddresses, keyList, keys, mdexTokenOwner} = require('./info.json');
 
 module.exports = {
     keys: {
-        ALICE: info.keys.ALICE,
-        JACK: info.keys.JACK,
-        LISA: info.keys.LISA,
-        TEST: info.keys.TEST,
-        WANG: info.keys.WANG,
-        LI: info.keys.LI
+        ALICE: keys.ALICE,
+        JACK: keys.JACK,
+        LISA: keys.LISA,
+        TEST: keys.TEST,
+        WANG: keys.WANG,
+        LI: keys.LI
     },
-    keyList: info.keyList,
+    keyList: keyList,
     address: {
-        alice: info.addresses.alice,
-        jack: info.addresses.jack,
-        lisa: info.addresses.lisa,
-        test: info.addresses.test,
-        wang: info.addresses.wang,
-        li: info.addresses.li
+        alice: addresses.alice,
+        jack: addresses.jack,
+        lisa: addresses.lisa,
+        test: addresses.test,
+        wang: addresses.wang,
+        li: addresses.li,
+        tokenOwner: mdexTokenOwner
     },
-    aelfAddresses: info.aelfAddresses,
-    aelfAddress : info.aelfAddress,
-    privateKeys: [
-        info.keys.ALICE,
-        info.keys.JAMES,
-        info.keys.JACK,
-        info.keys.LISA,
-        info.keys.TEST,
-        info.keys.WANG,
-        info.keys.LI
-    ]
+    aelfAddresses: aelfAddresses,
+    aelfAddress : aelfAddress
 }

@@ -9,7 +9,7 @@ const argv = require('minimist')(process.argv.slice(2), {
 });
 const controller = contracts.kovan.controller;
 
-const owner = keys.address.wang;
+const owner = keys.address.test;
 const tester = keys.address.test;
 const symbols = info.symbol;
 
@@ -26,10 +26,14 @@ module.exports = async function () {
     let Controller;
     let fundContracts = [];
     let strategyContracts = [];
-    let senderPkey = keys.keys.WANG;
+    let boardContracts = [];
+    let senderPkey = keys.keys.TEST;
 
     let fundPools = info.poolInfo;
     let strategies = info.strategyInfo;
+    let boardStrategies = info.boradStrategy;
+
+    let sVaultNetValueAddress = info.sVaultNetValueAddress;
 
     if (argv['network'] === 'kovan') {
         web3 = await providers.useKovanProvider(senderPkey);
@@ -42,6 +46,10 @@ module.exports = async function () {
         for (let i = 0; i < strategies.length; i++) {
             let strategyContract = await contract.initContract('Strategy', web3, strategies[i]);
             strategyContracts.push(strategyContract);
+        }
+        for(let i = 0; i < boardStrategies.length; i ++){
+            let boardContract = await contract.initContract('BoardStrategy', web3, boardStrategies[i]);
+            boardContracts.push(boardContract);
         }
     }
 
@@ -83,6 +91,9 @@ module.exports = async function () {
     for (const s of strategyContracts){
         await AddStrategy(Controller,s.address);
     }
+    for (const b of boardContracts){
+        await AddStrategy(Controller,b.address);
+    }
 
     logger.info('=== set strategy ===')
     for (const s of strategyContracts){
@@ -94,6 +105,60 @@ module.exports = async function () {
             }
         }
     }
+    for (const b of boardContracts){
+        //check board symbol
+        let tokens = await contract.callViewMethod(b, 'getTokens');
+        for (let pools of poolsInfo){
+            if (tokens[0].toLowerCase() === pools.symbol.toLowerCase()){
+                await SetStrategy(Controller,b.address,pools.pool)
+            }
+        }
+    }
+
+    // logger.info("==== set fee ====")
+    // let withdrawFeeRate = [["0","15000000000000000"],["7","7500000000000000"],["30","5000000000000000"],["365","2500000000000000"],["730","0"]];
+    // for (let fc of fundContracts){
+    //     let token = await contract.callViewMethod(fc,'token');
+    //     let profitRatePerBlock = await contract.callViewMethod(fc,'profitRatePerBlock');
+    //     if (token.toLowerCase() === info.symbol.usdt.toLowerCase() && profitRatePerBlock != 0){
+    //         logger.info("=== set usdt deposit fee 0 ====")
+    //         let setFee = await contract.callSendMethod(
+    //             fc,
+    //             "setDepositFeeRate",
+    //             owner,
+    //             []
+    //         );
+    //         logger.info(`setDepositFeeRate tx: ${setFee.transactionHash}: ${setFee.status}`);
+    //     }
+    //     logger.info("=== set withdraw fee rate ====")
+    //     let setWithdrawFeeRate = await contract.callSendMethod(
+    //         fc,"setWithdrawFeeRate",owner,[withdrawFeeRate]
+    //     );
+    //     logger.info(`setWithdrawFeeRate tx: ${setWithdrawFeeRate.transactionHash}: ${setWithdrawFeeRate.status}`);
+    //
+    //     if (token.toLowerCase() !== info.symbol.usdt.toLowerCase()){
+    //         logger.info("=== set  fee 0 ====")
+    //         let setManagementFee = await contract.callSendMethod(
+    //             fc,
+    //             "setManagementFeeRate",
+    //             owner,
+    //             []
+    //         );
+    //         logger.info(`setManagementFeeRate tx: ${setManagementFee.transactionHash}: ${setManagementFee.status}`);
+    //     }
+    // }
+
+    logger.info("==== set SVaultNetValue ====");
+    let result = await contract.callSendMethod(Controller,"setSVaultNetValue",owner,[sVaultNetValueAddress]);
+    logger.info(`SVaultNetValue tx: ${result.transactionHash}: ${result.status}`);
+    let getSVaultNet = await contract.callViewMethod(Controller,"sVaultNetValue");
+    logger.info(getSVaultNet);
+    console.assert(getSVaultNet === sVaultNetValueAddress, `actual sVault is ${getSVaultNet}`);
+
+    // logger.info("==== set withdraw settings ====");
+
+
+
     console.log(`end`);
 }
 
@@ -192,7 +257,7 @@ async function SetStrategy(controller,strategyContract,fundPool){
         'approvedStrategies',
         [fundPool,strategyContract]
     )
-    if (check != 0)
+    if (check)
     {
         logger.info(`pool: ${fundPool} ==== strategy: ${strategyContract} already set`)
         return;
@@ -221,6 +286,9 @@ async function CheckTokenPair(strategyContract){
     return tokens;
 }
 
+// async function SetWithdrawSettings(){
+//
+// }
 
 function isInSymbolList(token){
     Object.values(symbols).forEach(function (address) {tokenAddresses.push(address.toLowerCase())});
