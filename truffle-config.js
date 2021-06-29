@@ -16,7 +16,7 @@ module.exports = {
 
         kovan: {
             provider: function () {
-                return new HDWalletProvider(keys.privateKeys, providers.kovan, 0, keys.privateKeys.length)
+                return new HDWalletProvider(keys.keyList, providers.kovan, 0, keys.keyList.length)
             },
             network_id: 42,
             gas: 10000000,      //make sure this gas allocation isn't over 4M, which is the max
@@ -26,7 +26,7 @@ module.exports = {
 
         mainnet: {
             provider: function () {
-                return new HDWalletProvider(keys.privateKeys, providers.mainnet, 0,keys.privateKeys.length)
+                return new HDWalletProvider(keys.keyList, providers.mainnet, 0,keys.keyList.length)
             },
             network_id: 1,
             gas: 200000,      //make sure this gas allocation isn't over 4M, which is the max
@@ -35,11 +35,20 @@ module.exports = {
 
         bsctest:{
             provider: function (){
-                return new HDWalletProvider(keys.privateKeys, providers.bsctest, 0, keys.privateKeys.length)
+                return new HDWalletProvider(keys.keyList, providers.bsctest, 0, keys.keyList.length)
             },
             network_id: 97,
             gas: 10000000,      //make sure this gas allocation isn't over 4M, which is the max
             gasPrice : 10000000000, //160 GWei
+        },
+
+        bsc:{
+            provider: function (){
+                return new HDWalletProvider(keys.keyList, providers.bsc, 0, keys.keyList.length)
+            },
+            network_id: 56,
+            gas: 10000000,      //make sure this gas allocation isn't over 4M, which is the max
+            gasPrice : 10000000000, //10 GWei
         }
     },
     mocha: {

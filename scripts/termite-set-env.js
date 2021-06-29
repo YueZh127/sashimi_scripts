@@ -116,37 +116,36 @@ module.exports = async function () {
     }
 
     // logger.info("==== set fee ====")
-    // let withdrawFeeRate = [["0","15000000000000000"],["7","7500000000000000"],["30","5000000000000000"],["365","2500000000000000"],["730","0"]];
-    // for (let fc of fundContracts){
-    //     let token = await contract.callViewMethod(fc,'token');
-    //     let profitRatePerBlock = await contract.callViewMethod(fc,'profitRatePerBlock');
-    //     if (token.toLowerCase() === info.symbol.usdt.toLowerCase() && profitRatePerBlock != 0){
-    //         logger.info("=== set usdt deposit fee 0 ====")
-    //         let setFee = await contract.callSendMethod(
-    //             fc,
-    //             "setDepositFeeRate",
-    //             owner,
-    //             []
-    //         );
-    //         logger.info(`setDepositFeeRate tx: ${setFee.transactionHash}: ${setFee.status}`);
-    //     }
-    //     logger.info("=== set withdraw fee rate ====")
-    //     let setWithdrawFeeRate = await contract.callSendMethod(
-    //         fc,"setWithdrawFeeRate",owner,[withdrawFeeRate]
-    //     );
-    //     logger.info(`setWithdrawFeeRate tx: ${setWithdrawFeeRate.transactionHash}: ${setWithdrawFeeRate.status}`);
-    //
-    //     if (token.toLowerCase() !== info.symbol.usdt.toLowerCase()){
-    //         logger.info("=== set  fee 0 ====")
-    //         let setManagementFee = await contract.callSendMethod(
-    //             fc,
-    //             "setManagementFeeRate",
-    //             owner,
-    //             []
-    //         );
-    //         logger.info(`setManagementFeeRate tx: ${setManagementFee.transactionHash}: ${setManagementFee.status}`);
-    //     }
-    // }
+    let withdrawFeeRate = [["0","15000000000000000"],["7","7500000000000000"],["30","5000000000000000"],["365","2500000000000000"],["730","0"]];
+    for (let fc of fundContracts) {
+            let token = await contract.callViewMethod(fc,'token');
+            let profitRatePerBlock = await contract.callViewMethod(fc,'profitRatePerBlock');
+            if (token.toLowerCase() === info.symbol.usdt.toLowerCase() && profitRatePerBlock != 0){
+                logger.info("=== set usdt deposit fee 0 ====")
+                let setFee = await contract.callSendMethod(
+                    fc,
+                    "setDepositFeeRate",
+                    owner,
+                    []
+                );
+                logger.info(`setDepositFeeRate tx: ${setFee.transactionHash}: ${setFee.status}`);
+            }
+        logger.info("=== set withdraw fee rate ====")
+        let setWithdrawFeeRate = await contract.callSendMethod(
+            fc, "setWithdrawFeeRate", owner, [withdrawFeeRate]
+        );
+        logger.info(`setWithdrawFeeRate tx: ${setWithdrawFeeRate.transactionHash}: ${setWithdrawFeeRate.status}`);
+        if (token.toLowerCase() !== info.symbol.usdt.toLowerCase()){
+            logger.info("=== set  fee 0 ====")
+            let setManagementFee = await contract.callSendMethod(
+                fc,
+                "setManagementFeeRate",
+                owner,
+                []
+            );
+            logger.info(`setManagementFeeRate tx: ${setManagementFee.transactionHash}: ${setManagementFee.status}`);
+        }
+    }
 
     logger.info("==== set SVaultNetValue ====");
     let result = await contract.callSendMethod(Controller,"setSVaultNetValue",owner,[sVaultNetValueAddress]);
@@ -154,9 +153,6 @@ module.exports = async function () {
     let getSVaultNet = await contract.callViewMethod(Controller,"sVaultNetValue");
     logger.info(getSVaultNet);
     console.assert(getSVaultNet === sVaultNetValueAddress, `actual sVault is ${getSVaultNet}`);
-
-    // logger.info("==== set withdraw settings ====");
-
 
 
     console.log(`end`);
@@ -257,7 +253,7 @@ async function SetStrategy(controller,strategyContract,fundPool){
         'approvedStrategies',
         [fundPool,strategyContract]
     )
-    if (check)
+    if (check == 1)
     {
         logger.info(`pool: ${fundPool} ==== strategy: ${strategyContract} already set`)
         return;

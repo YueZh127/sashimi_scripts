@@ -27,6 +27,16 @@ async function useBscTestProvider(senderPkey) {
     return this.web3;
 }
 
+async function useBscProvider(senderPkey) {
+    console.log('using bsc provider..');
+    this.web3 = new Web3(info.bsc);
+    this.pkey = senderPkey;
+    this.web3.eth.accounts.wallet.add(this.pkey)
+    this.walletOwnerAddress = '0x'+ethUtils.privateToAddress(ethUtils.toBuffer('0x' + this.pkey)).toString('hex')
+    this.web3.eth.defaultAccount = this.walletOwnerAddress
+    return this.web3;
+}
+
 async function addAccount(Web3, keys){
     console.log('add keys...');
     keys.forEach(function (k){
@@ -38,11 +48,13 @@ async function addAccount(Web3, keys){
 module.exports ={
     mainnet : info.mainnet,
     kovan : info.kovan,
-    bsctest: info.bsctest,
+    bsctest : info.bsctest,
+    bsc : info.bsc,
 
     useKovanProvider : useKovanProvider,
     useMainnetProvider : useMainnetProvider,
     useBscTestProvider : useBscTestProvider,
+    useBscProvider: useBscProvider,
 
     addAccount:addAccount
 }
