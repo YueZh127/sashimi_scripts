@@ -1,4 +1,4 @@
-const elfAbi = require('../build/contracts/ERC20.json');
+const elfAbi = require('../build/contracts/ERC20_1.json');
 
 async function getWETH(WETH,wETHAddress) {
     console.log(`get wETH... ${wETHAddress}`);

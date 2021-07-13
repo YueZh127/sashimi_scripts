@@ -1,0 +1,47 @@
+{
+  "kovan": {
+    "factory": [
+      "0x9ec4F0BFcb620c6d0f65eDdb42c1bEF0837d4dd3"
+    ],
+    "router": [
+      "0x7cddf2e11C830673Ad21BB54f8F4054E76E1685f"
+    ],
+    "feeRate": [
+      "30"
+    ],
+    "usdt-dai": [
+      "0x39Ff59958358AbEb08C2c8a5a00F2820e126989d"
+    ],
+    "kLast": [
+      "2913864371741180000000000000000000",
+      "484000000000000000000000000000000",
+      "121000000000000000000000000000000"
+    ],
+    "tokens": [
+      {
+        "name": "usdt",
+        "address": "0xEaDB35C874369C72a7F06d51b41C99c2a3BC448D"
+      },
+      {
+        "name": "usdc",
+        "address": "0xBCE1c2ad576b28Ae6bDc1fA4dBA6a9130598Cd7b"
+      },
+      {
+        "name": "dai",
+        "address": "0x4bedb4cff3b8ea0474f534838e767c11d6b311f2"
+      },
+      {
+        "name": "weth",
+        "address": "0xcD8f49c7ADf341bD6B112B7e0a63F9b59912d0AF"
+      },
+      {
+        "name": "wbtc",
+        "address": "0x2E0a68203FA35E45B456cbb00F7744A44b43Bc0C"
+      },
+      {
+        "name": "elf",
+        "address": "0xB5685232b185cAdF7C5F58217722Ac40BC4ec45e"
+      }
+    ]
+  }
+}

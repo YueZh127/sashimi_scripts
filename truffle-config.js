@@ -20,35 +20,35 @@ module.exports = {
             },
             network_id: 42,
             gas: 10000000,      //make sure this gas allocation isn't over 4M, which is the max
-            gasPrice : 10000000000, //10 GWei
+            gasPrice: 10000000000, //10 GWei
             networkCheckTimeout: 10000000
         },
 
         mainnet: {
             provider: function () {
-                return new HDWalletProvider(keys.keyList, providers.mainnet, 0,keys.keyList.length)
+                return new HDWalletProvider(keys.keyList, providers.mainnet, 0, keys.keyList.length)
             },
             network_id: 1,
             gas: 200000,      //make sure this gas allocation isn't over 4M, which is the max
-            gasPrice : 160000000000, //160 GWei
+            gasPrice: 160000000000, //160 GWei
         },
 
-        bsctest:{
-            provider: function (){
+        bsctest: {
+            provider: function () {
                 return new HDWalletProvider(keys.keyList, providers.bsctest, 0, keys.keyList.length)
             },
             network_id: 97,
             gas: 10000000,      //make sure this gas allocation isn't over 4M, which is the max
-            gasPrice : 10000000000, //160 GWei
+            gasPrice: 10000000000, //160 GWei
         },
 
-        bsc:{
-            provider: function (){
+        bsc: {
+            provider: function () {
                 return new HDWalletProvider(keys.keyList, providers.bsc, 0, keys.keyList.length)
             },
             network_id: 56,
             gas: 10000000,      //make sure this gas allocation isn't over 4M, which is the max
-            gasPrice : 10000000000, //10 GWei
+            gasPrice: 10000000000, //10 GWei
         }
     },
     mocha: {
@@ -56,17 +56,23 @@ module.exports = {
     },
     compilers: {
         solc: {
-            version: "0.6.12"
+            version: "^0.6.12",
+            settings: {          // See the solidity docs for advice about optimization and evmVersion
+                optimizer: {
+                    enabled: true,
+                    runs: 200
+                }
+            }
         }
     },
     plugins: [
         'truffle-plugin-verify'
     ],
-
+    license: "MIT",
     api_keys: {
         etherscan: info.api_etherscan
     },
 
     // sender : keys.address.bob,
-    sender : keys.address.lisa,
+    sender: keys.address.lisa,
 };

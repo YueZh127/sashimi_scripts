@@ -5,7 +5,7 @@ const Web3 = require('web3');
 const helper = require('./helper');
 const BigNumber = require('bignumber.js');
 const logger = require('log-js')();
-const priceInfo = require('../price-info.json');
+const priceInfo = require('./data/price-info.json');
 
 
 let web3;

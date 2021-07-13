@@ -48,7 +48,7 @@ function writeJsonSync(file, obj) {
 
 async function readJson(file) {
     let data;
-    await readFile( directory + `/${file}`, 'utf8').then((text) => {
+    await readFile( directory + `/${file}.json`, 'utf8').then((text) => {
         console.log("JSON data load.");
         data = text;
     }).catch((err) => {
@@ -88,6 +88,15 @@ function helperMethod(a,b,c){
     }
 }
 
+function getRndInteger(min, max) {
+    return new BigNumber(Math.floor(Math.random() * (max - min + 1)) + min);
+}
+
+function sleep(time) {
+    return new Promise((resolve) => setTimeout(resolve, time));
+}
+
+
 module.exports = {
     encodeParameters: encodeParameters,
     latestBlockTime: latestBlockTIme,
@@ -97,5 +106,7 @@ module.exports = {
     writeJsonSync: writeJsonSync,
     readJson: readJson,
     readJsonWithPath: readJsonWithPath,
-    helperMethod: helperMethod
+    helperMethod: helperMethod,
+    getRndInteger: getRndInteger,
+    sleep:sleep
 }

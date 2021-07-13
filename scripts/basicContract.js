@@ -1,41 +1,17 @@
 const TokenJson = require('../build/contracts/ERC20.json');
 const TetherJson = require('../build/contracts/TetherToken.json');
-const LockJson = require('../build/contracts/LockMapping.json');
-const MerkleJson = require('../build/contracts/MerkleTreeGenerator.json');
-const ReceiptMakerJson = require('../build/contracts/ReceiptMaker.json');
-const DistributorJson = require('../build/contracts/MerkleDistributor.json');
-const CrossChainJson = require('../build/contracts/CrossChain.json');
-const OracleJson = require('../build/contracts/AccessControlledOffchainAggregator.json');
-const FundPoolJson = require('../build/contracts/FundPoolDelegate.json');
-const ControllerJson = require('../build/contracts/Controller.json');
-const StrategyJson = require('../build/contracts/FarmStrategy.json');
-const BoardStrategyJson = require("../build/contracts/BoardRoomMDXStrategy.json");
+const WETH9Json = require('../build/contracts/WETH9.json')
 
-const FactoryJson = require('../build/contracts/MdexFactory.json');
-const RouterJson = require('../build/contracts/MdexRouter.json');
-const PoolJson = require('../build/contracts/BSCPool.json');
-const BoardRoomMDXJson = require('../build/contracts/BoardRoomMDX.json');
-const MdxTokenJson = require('../build/contracts/MdxToken.json');
-const PairJson = require('../build/contracts/MdexPair.json');
+const SashimiFactory = require('../build/contracts/UniswapV2Factory.json')
+const SashimiRouter = require('../build/contracts/UniswapV2Router02.json')
+const PairJson = require('../build/contracts/UniswapV2Pair.json');
 
 const TokenABI = TokenJson["abi"];
 const TetherABI = TetherJson["abi"];
-const LockABI = LockJson["abi"];
-const MerkleABI = MerkleJson["abi"];
-const ReceiptMakerABI = ReceiptMakerJson["abi"];
-const DistributorABI = DistributorJson["abi"];
-const CrossChainABI = CrossChainJson["abi"];
-const OracleABI = OracleJson["abi"];
-const FundPoolABI = FundPoolJson["abi"];
-const ControllerABI = ControllerJson["abi"];
-const StrategyABI = StrategyJson["abi"];
-const BoardStrategyABI = BoardStrategyJson["abi"];
+const WETHABI = WETH9Json["abi"]
 
-const FactoryABI = FactoryJson["abi"];
-const RouterABI = RouterJson["abi"];
-const PoolABI = PoolJson["abi"];
-const BoardMDXABI = BoardRoomMDXJson["abi"];
-const MdxTokenABI = MdxTokenJson["abi"];
+const FactoryABI = SashimiFactory["abi"];
+const RouterABI = SashimiRouter["abi"];
 const PairABI = PairJson["abi"];
 
 const info = require('../info.json');
@@ -43,23 +19,11 @@ const info = require('../info.json');
 const contractsABI = {
     ERC20Token: TokenABI,
     Tether: TetherABI,
-    Lock: LockABI,
-    Merkle: MerkleABI,
-    ReceiptMaker: ReceiptMakerABI,
-    Distributor: DistributorABI,
-    CrossChain: CrossChainABI,
-    Oracle: OracleABI,
-    FundPool: FundPoolABI,
-    Controller: ControllerABI,
-    Strategy: StrategyABI,
-    BoardStrategy: BoardStrategyABI,
+    WETH: WETHABI,
 
     Factory: FactoryABI,
     Router: RouterABI,
-    Farm: PoolABI,
-    MdxToken: MdxTokenABI,
-    Pair: PairABI,
-    BoardMDX:BoardMDXABI
+    Pair: PairABI
 };
 
 async function initContract(contractName, web3, contractAddress, contractABI = null) {
@@ -109,7 +73,7 @@ async function callSendMethod(contract, functionName, account, paramsOption,valu
     }
 }
 
-function callSendMethodWithOutResult(contract, functionName, account, paramsOption,nonce,value =0) {
+function callSendMethodWithoutResult(contract, functionName, account, paramsOption,nonce,value =0) {
     try {
         console.log(paramsOption);
 
@@ -141,5 +105,5 @@ module.exports = {
     initContract: initContract,
     callViewMethod: callViewMethod,
     callSendMethod: callSendMethod,
-    callSendMethodWithOutResult:callSendMethodWithOutResult
+    callSendMethodWithoutResult:callSendMethodWithoutResult
 }

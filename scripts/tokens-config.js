@@ -4,8 +4,10 @@ module.exports = {
     kovan: {
         weth: info.tokens.kovan.weth,
         usdt: info.tokens.kovan.usdt,
-        elf: info.tokens.kovan.elf,
-        shd: info.tokens.kovan.shd
+        usdc: info.tokens.kovan.usdc,
+        wbtc: info.tokens.kovan.wbtc,
+        dai: info.tokens.kovan.dai,
+        elf: info.tokens.kovan.elf
     },
 
     mainnet: {
